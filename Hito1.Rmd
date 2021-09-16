@@ -17,7 +17,7 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ```{r}
 # Asignamos nuestro "working directory" (set w. d.) como el directorio ~/RDATA
-setwd("~/RDATA/")
+setwd("~/RDATA/Hito1/Data-Mining-CC5206")
 ```
 #Cargamos los datos
 

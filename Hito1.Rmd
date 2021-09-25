@@ -10,23 +10,65 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
+## HITO 1: Análisis clientes Block 
+María Hernández, Sebastián Moreno, Lung Pang, Cristóbal Saldías, Víctor Vidal.
+Septiembre 2021
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+1 Introducción
+
+Blockstore es una cadena de tiendas, ubicada en Chile, enfocada la venta de zapatillas, accesorios y vestuario de las mejores marcas urbanas.
+Dada la contingencia mundial de la pandemia y el estallido social del 2019, Block tuvo que adaptarse al canal de ventas online por lo que la necesidad de la aplicación de análisis de datos y en particular de minería de datos va en el contexto cambiante en el ámbito nacional, donde la crisis social, pandemia, mayor dinero circulante y un aumento explosivo en ventas online hacen necesario tener las mejores estrategias diferenciadas para cada cliente,
+
+Es por esto que decidimos estudiar el comportamiento de compra de los clientes a nivel nacional.
+Nos parece interesante estudiar estos datos para generar más ventas enfocando una estrategia de negocios diferenciada para cada grupo de clientes en específico de acuerdo a sus gustos.
+
+
+2 Exploración de Datos
 
 ```{r}
 # Asignamos nuestro "working directory" (set w. d.) como el directorio ~/RDATA
 setwd("~/RDATA/")
 ```
-#Cargamos los datos
-
+# Cargamos los datos originales 
+Sin embargo, estos datos no están limpios debido a que los clientes no ingresaron bien los datos, por lo que se realizó una limpieza de los datos para poder trabajar de mejor manera.
 ```{r}
-pedidos <- read.csv("orders.csv", encoding = "UTF-8")
-pedidos_detalle <-read.csv("order_detail.csv", encoding = "UTF-8")
+pedidos_preeliminar <- read.csv("orders.csv", encoding = "UTF-8")
+pedidos_detalle_preeliminar <-read.csv("order_detail.csv", encoding = "UTF-8")
 ```
 
-#10 primeros pedidos
+# A modo de resumen se deja un head y la cantidad de columnas y filas de cada dataset
+```{r}
+head(pedidos_preeliminar)
+head(pedidos_detalle_preeliminar)
+nrow(pedidos_preeliminar)
+ncol(pedidos_preeliminar)
+nrow(pedidos_detalle_preeliminar)
+ncol(pedidos_detalle_preeliminar)
+
+```
+Para la limpieza se eliminaron filas vacías, datos "dummy" realizados por la empresa, y otros valores incosistentes y repetitivos.
+```{r}
+
+pedidos<-read.csv("Orders_OFICIAL.csv", encoding = "UTF-8", sep=";")
+pedidos_detalle <-read.csv("ORDER_DETAIL_OFICIAL.csv", encoding = "UTF-8",sep=";")
+(pedidos)
+(pedidos_detalle)
+```
+
+```{R}
+
+library(dplyr)
+
+pedidos$Fecha.Compra <- as.Date(pedidos$Fecha.Compra, format ="%d-%m-%y")
+(pedidos)
+```
+
+
+# 10 primeros pedidos
 
 ```{r}
 head(pedidos, 20)
@@ -38,58 +80,45 @@ head(pedidos, 20)
 head(pedidos_detalle, 20)
 ```
 
-
-
 ```{r}
 summary(pedidos)
-
 ```
 
 ```{R}
 library(ggplot2)
 ```
 
-#Exploración de datos
-
-```{R}
 
 
-library(dplyr)
-pedidos_fecha <-pedidos %>%
-                  mutate(created_at = substr(created_at, 1, 10))
 
-
-pedidos_fecha$created_at <- as.Date(pedidos_fecha$created_at, format =  "%Y-%m-%d")
-(pedidos_fecha)
-```
 
 ##A continuación les dejaremos el estudio de datos sobre nuestro dataset
 
 #A grandes razgos podemos calcular la cantidad promedio que se gasta una persona en una tienda de zapatillas
 ```{r}
 nfilas <- nrow(pedidos_fecha)
-(nfilas)
+
 total_vendido <- sum(pedidos_fecha$current_total_price)
 promedio_pedidos <- total_vendido/nfilas
 (promedio_pedidos)
 ```
 
 
-##Vamos a ver primero la cantidad de gente que pide más y menos que el promedio 
+# Vamos a ver primero la cantidad de gente que pide más y menos que el promedio 
 ```{r}
 
 
 
 #La gente que pide mas que el promedio
 
-pedidos_RM_mayorpromedio <- data.frame(pedidos[pedidos$customer.default_address.province_code == "RM" &
-                                       pedidos$current_total_price > promedio_pedidos,] )
+pedidos_RM_mayorpromedio <- data.frame(pedidos[pedidos$REGION.CON.CODIGO == "RM" &
+                                       pedidos$Precio.Pedido > promedio_pedidos,] )
 nrow(pedidos_RM_mayorpromedio)
 
 #La gente que pide menos que el promedio
 
-pedidos_RM_menorpromedio <- data.frame(pedidos[pedidos$customer.default_address.province_code == "RM" &
-                                       pedidos$current_total_price <= promedio_pedidos,] )
+pedidos_RM_menorpromedio <- data.frame(pedidos[pedidos$REGION.CON.CODIGO == "RM" &
+                                       pedidos$Precio.Pedido <= promedio_pedidos,] )
 nrow(pedidos_RM_menorpromedio)
 
 ```
@@ -97,19 +126,31 @@ nrow(pedidos_RM_menorpromedio)
 ##El pedido mas caro en block online
 ```{R}
 
-pedidos[which.max(pedidos$current_total_price),]
+pedidos[which.max(pedidos$Precio.Pedido),]
 
 
 ```
-OTRO 
+
+# La cantidad de pedidos dividos por región
+
+```{r}
+
+
+ggplot(pedidos, aes(x = REGION.CON.CODIGO),) +
+   ggtitle("Cantidad de pedidos por región") +
+  geom_bar()
+
+```
+
+# Cantidad de pedidos dividos por comuna 
 ```{R}
 
 
 
-pedidos_comuna <- data.frame(pedidos[pedidos$customer.default_address.province_code == "RM", ] )
+pedidos_comuna <- data.frame(pedidos[pedidos$REGION.CON.CODIGO == "RM", ] )
 
 
-ggplot(pedidos_comuna, aes(x = customer.default_address.zip ),) +
+ggplot(pedidos_comuna, aes(x = Comuna ),) +
    ggtitle("Cantidad de pedidos por Comuna") +
   coord_flip() +
   geom_bar()
@@ -117,21 +158,21 @@ ggplot(pedidos_comuna, aes(x = customer.default_address.zip ),) +
 
 
 ```{r}
-pedidos_comuna_Lascondes <- data.frame(pedidos[pedidos$customer.default_address.zip == "LAS CONDES", ] )
+pedidos_comuna_Lascondes <- data.frame(pedidos[pedidos$Comuna == "LAS CONDES", ] )
 (pedidos_comuna_Lascondes)
 nrow(pedidos_comuna_Lascondes)
-mean(pedidos_comuna_Lascondes$current_total_price)
-sum(pedidos_comuna_Lascondes$current_total_price)
+mean(pedidos_comuna_Lascondes$Precio.Pedido)
+sum(pedidos_comuna_Lascondes$Precio.Pedido)
 
 
-pedidos_comuna_puentealto <- data.frame(pedidos[pedidos$customer.default_address.zip == "PUENTE ALTO", ] )
+pedidos_comuna_puentealto <- data.frame(pedidos[pedidos$Comuna == "PUENTE ALTO", ] )
 (pedidos_comuna_puentealto)
 nrow(pedidos_comuna_puentealto)
-mean(pedidos_comuna_puentealto$current_total_price)
-sum(pedidos_comuna_puentealto$current_total_price)
+mean(pedidos_comuna_puentealto$Precio.Pedido)
+sum(pedidos_comuna_puentealto$Precio.Pedido)
 
 
-ggplot(pedidos_comuna_puentealto, aes(x = customer.default_address.zip, y = customer.total_spent ),) +
+ggplot(pedidos_comuna_puentealto, aes(x = Comuna, y = Total.Gastado.Cliente ),) +
    ggtitle("Cantidad de pedidos por Comuna") +
  coord_flip() +
  geom_line()
@@ -139,21 +180,11 @@ ggplot(pedidos_comuna_puentealto, aes(x = customer.default_address.zip, y = cust
 
 ```
 
-xd
-```{r}
-
-
-ggplot(pedidos, aes(x = customer.default_address.province_code),) +
-   ggtitle("Cantidad de pedidos por región") +
-  geom_bar()
-
-```
-
 
 #Se deja un historial de pedidos desde el inicio del dataset hasta la ultima fecha presente
 ```{r}
 library(ggplot2)
-ggplot(pedidos_fecha, aes(x = created_at) ) +
+ggplot(pedidos, aes(x = Fecha.Compra) ) +
   geom_bar() +
   scale_x_date(date_breaks = "1 month",
              date_labels = "%b") +
@@ -162,3 +193,23 @@ ggplot(pedidos_fecha, aes(x = created_at) ) +
        y = "Cantidad de pedidos")
 
 ```
+# Vamos a ver cuanto se ha vendido en block por marca
+```{r}
+
+ggplot(pedidos_detalle, aes(x=reorder(Marca ,Marca,
+                     function(x)-length(x)))) +
+  geom_bar() +
+  coord_flip() +
+  labs(title = "Marcas mas vendidas",
+       x = "Marcas",
+       y = "Cantidad de compras")
+
+```
+
+Preguntas y problemas: Dada la exploración anterior y su motivación original, formular preguntas que se pueden responder mediante la minería de datos y que se puedan vincular a la problemática planteada en la motivación
+
+¿Cómo se relaciona el precio de la compra con el lugar desde donde se pidió?(regiones piden paquetes más caros? )
+¿Qué marcas se compran más según el sector?
+¿Qué productos se compran juntos?
+¿Existe una tendencia en la segunda compra con respecto a la primera?(se compra la misma marca 2 veces?)
+¿Qué producto puede que compre alguien que ya adquirió x producto?  

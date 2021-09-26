@@ -57,23 +57,36 @@ También se hizo un refactoring de los nombres de las columnas para un mejor ent
 pedidos<-read.csv("Orders_OFICIAL.csv", encoding = "UTF-8", sep=";")
 pedidos_detalle <-read.csv("ORDER_DETAIL_OFICIAL.csv", encoding = "UTF-8",sep=";")
 pedidos$count <- as.numeric(ave(pedidos$Comuna, pedidos$Comuna, FUN = length))
+pedidos_detalle$count.marca <- as.numeric(ave(pedidos_detalle$Marca, pedidos_detalle$Marca, FUN = length))
+
+
+```
+Dejamos un resumen del data pedidos
+
+```{r}
 (pedidos)
 nrow(pedidos)
 ncol(pedidos)
+
+```
+Dejamos un resumen del data pedidos_detalle
+
+```{r}
 (pedidos_detalle)
 nrow(pedidos_detalle)
 ncol(pedidos_detalle)
-
 ```
 
-```{R}
 
-library(dplyr)
+```{R}
 
 pedidos$Fecha.Compra <- as.Date(pedidos$Fecha.Compra, format ="%d-%m-%Y")
 (pedidos)
 
+
 pedidos_detalle$Fecha.Pedido <- as.Date(pedidos_detalle$Fecha.Pedido, format ="%Y-%m-%d")
+pedidos_detalle$anio <- as.numeric(format(pedidos_detalle$Fecha.Pedido,'%Y'))
+
 (pedidos_detalle)
 
 ```
@@ -128,7 +141,9 @@ nrow(pedidos_RM_menorpromedio)
 ```{R}
 
 pedidos[which.max(pedidos$Precio.Pedido),]
+#usamos su numero de pedido para ver las compras realizadas
 pedido_maximo_detalle <- pedidos_detalle[pedidos_detalle$Numero.Pedido == "#BL4499",]
+#verificamos el dinero sea consistente en ambas tablas
 sum(pedido_maximo_detalle$Precio.Total.Productos)
 ```
 
@@ -142,20 +157,22 @@ ggplot(pedidos, aes(x = REGION.CON.CODIGO),) +
 
 ```
 
+
 # Cantidad de pedidos dividos por comuna 
 ```{R}
 
 
+freq_comuna <- data.frame(comuna = pedidos$Comuna, count = pedidos$count)
+freq_comuna <-  unique(freq_comuna)
+freq_comuna <- freq_comuna[order(freq_comuna[,"count"], decreasing = TRUE),]
 
-pedidos_comuna <- data.frame(pedidos[pedidos$REGION.CON.CODIGO == "RM", ] )
-pedidos_comuna[which.max(pedidos_comuna$count),]
-(pedidos_comuna)
+(freq_comuna)
 
-ggplot(pedidos_comuna, aes(x=reorder(Comuna , Comuna,
-                     function(x)-length(x)))) +
-   ggtitle("Cantidad de pedidos por Comuna") +
+ggplot(freq_comuna[1:30,], aes(x = reorder(comuna , count),
+                     y = count)) +
+   ggtitle("Las 30 Comunas con mas pedidos del pais") +
   coord_flip() +
-  geom_bar()
+  geom_bar(stat = "identity")
 ```
 # Puente alto y Las condes son de las comunas más pobladas de la RM
 # Puente alto es una de las comunas más "zapatilleras" vs "Las condes" que es una comuna
@@ -176,12 +193,6 @@ mean(pedidos_comuna_puentealto$Precio.Pedido)
 sum(pedidos_comuna_puentealto$Precio.Pedido)
 
 
-ggplot(pedidos_comuna_puentealto, aes(x = Comuna, y = Total.Gastado.Cliente ),) +
-   ggtitle("Cantidad de pedidos por Comuna") +
- coord_flip() +
- geom_line()
-
-
 ```
 
 
@@ -193,7 +204,7 @@ ggplot(pedidos, aes(x = Fecha.Compra) ) +
   geom_bar() +
   scale_x_date(date_breaks = "1 month",
              date_labels = "%b") +
-  labs(title = "Compras",
+  labs(title = "Compras a lo largo del tiempo",
        x = "fecha",
        y = "Cantidad de pedidos")
 
@@ -201,15 +212,54 @@ ggplot(pedidos, aes(x = Fecha.Compra) ) +
 # Vamos a ver cuanto se ha vendido en block por marca
 ```{r}
 
-ggplot(pedidos_detalle, aes(x=reorder(Marca ,Marca,
-                     function(x)-length(x)))) +
-  geom_bar() +
+
+
+freq_marca <- data.frame(marca = pedidos_detalle$Marca, count = pedidos_detalle$count.marca)
+freq_marca <-  distinct(freq_marca)
+freq_marca <- freq_marca[order(freq_marca[,"count"], decreasing = TRUE),]
+
+(freq_marca)
+
+ggplot(freq_marca[1:30,], aes(x = reorder(marca , count),
+                     y = count)) +
+   ggtitle("Las 30 Marcas con mas pedidos del pais") +
   coord_flip() +
-  labs(title = "Marcas mas vendidas",
-       x = "Marcas",
-       y = "Cantidad de compras")
+  geom_bar(stat = "identity")
 
 ```
+
+# Vamos a ver cuanto se ha vendido en block por marca
+```{r}
+
+
+precio_marca <- data.frame(marca = pedidos_detalle$Marca, precio = pedidos_detalle$Precio.Producto)
+
+
+(precio_marca)
+
+ggplot(pedidos_detalle, aes(x = Marca, y = Precio.Producto)) +
+  geom_boxplot()+
+  coord_flip() +
+  ggtitle("Precios de la marca")
+
+```
+# Marca mas vendida por año
+
+
+ggplot(pedidos_detalle[pedidos_detalle$Marca, ], 
+       aes(x=Marca, y=count.marca)) +
+  coord_flip() +
+  geom_bar(stat="identity")
+
+
+```{r}
+
+
+
+
+  
+```
+
 
 Preguntas y problemas: Dada la exploración anterior y su motivación original, formular preguntas que se pueden responder mediante la minería de datos y que se puedan vincular a la problemática planteada en la motivación
 

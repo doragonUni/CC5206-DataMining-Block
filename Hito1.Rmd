@@ -51,37 +51,36 @@ ncol(pedidos_detalle_preeliminar)
 
 ```
 Para la limpieza se eliminaron filas vacías, datos "dummy" realizados por la empresa, y otros valores incosistentes y repetitivos.
+También se hizo un refactoring de los nombres de las columnas para un mejor entendimiento del dataset.
 ```{r}
 
 pedidos<-read.csv("Orders_OFICIAL.csv", encoding = "UTF-8", sep=";")
 pedidos_detalle <-read.csv("ORDER_DETAIL_OFICIAL.csv", encoding = "UTF-8",sep=";")
+pedidos$count <- as.numeric(ave(pedidos$Comuna, pedidos$Comuna, FUN = length))
 (pedidos)
+nrow(pedidos)
+ncol(pedidos)
 (pedidos_detalle)
+nrow(pedidos_detalle)
+ncol(pedidos_detalle)
+
 ```
 
 ```{R}
 
 library(dplyr)
 
-pedidos$Fecha.Compra <- as.Date(pedidos$Fecha.Compra, format ="%d-%m-%y")
+pedidos$Fecha.Compra <- as.Date(pedidos$Fecha.Compra, format ="%d-%m-%Y")
 (pedidos)
-```
 
+pedidos_detalle$Fecha.Pedido <- as.Date(pedidos_detalle$Fecha.Pedido, format ="%Y-%m-%d")
+(pedidos_detalle)
 
-# 10 primeros pedidos
-
-```{r}
-head(pedidos, 20)
-```
-
-#10 primeros pedidos_detalle
-
-```{r}
-head(pedidos_detalle, 20)
 ```
 
 ```{r}
 summary(pedidos)
+summary(pedidos_detalle)
 ```
 
 ```{R}
@@ -94,11 +93,11 @@ library(ggplot2)
 
 ##A continuación les dejaremos el estudio de datos sobre nuestro dataset
 
-#A grandes razgos podemos calcular la cantidad promedio que se gasta una persona en una tienda de zapatillas
+#A grandes razgos podemos calcular la cantidad promedio que se gasta una persona en Block
 ```{r}
-nfilas <- nrow(pedidos_fecha)
+nfilas <- nrow(pedidos)
 
-total_vendido <- sum(pedidos_fecha$current_total_price)
+total_vendido <- sum(pedidos$Precio.Pedido)
 promedio_pedidos <- total_vendido/nfilas
 (promedio_pedidos)
 ```
@@ -124,17 +123,18 @@ nrow(pedidos_RM_menorpromedio)
 ```
 
 ##El pedido mas caro en block online
+## Podemos ver que en la tabla pedidos_Detalles según el numero de pedido podemos ver el detalle
+## de la compra que realizó la clienta.
 ```{R}
 
 pedidos[which.max(pedidos$Precio.Pedido),]
-
-
+pedido_maximo_detalle <- pedidos_detalle[pedidos_detalle$Numero.Pedido == "#BL4499",]
+sum(pedido_maximo_detalle$Precio.Total.Productos)
 ```
 
-# La cantidad de pedidos dividos por región
+# La cantidad de pedidos divididos por región
 
 ```{r}
-
 
 ggplot(pedidos, aes(x = REGION.CON.CODIGO),) +
    ggtitle("Cantidad de pedidos por región") +
@@ -148,14 +148,18 @@ ggplot(pedidos, aes(x = REGION.CON.CODIGO),) +
 
 
 pedidos_comuna <- data.frame(pedidos[pedidos$REGION.CON.CODIGO == "RM", ] )
+pedidos_comuna[which.max(pedidos_comuna$count),]
+(pedidos_comuna)
 
-
-ggplot(pedidos_comuna, aes(x = Comuna ),) +
+ggplot(pedidos_comuna, aes(x=reorder(Comuna , Comuna,
+                     function(x)-length(x)))) +
    ggtitle("Cantidad de pedidos por Comuna") +
   coord_flip() +
   geom_bar()
 ```
-
+# Puente alto y Las condes son de las comunas más pobladas de la RM
+# Puente alto es una de las comunas más "zapatilleras" vs "Las condes" que es una comuna
+# que tiende mas a la ropa formal y a continuación veremos la cantidad de pedidos, el promedio de estos y la suma total de dinero de las respectivas comunas
 
 ```{r}
 pedidos_comuna_Lascondes <- data.frame(pedidos[pedidos$Comuna == "LAS CONDES", ] )
@@ -181,7 +185,8 @@ ggplot(pedidos_comuna_puentealto, aes(x = Comuna, y = Total.Gastado.Cliente ),) 
 ```
 
 
-#Se deja un historial de pedidos desde el inicio del dataset hasta la ultima fecha presente
+# Se deja un historial de pedidos desde el inicio del dataset hasta la ultima fecha presente
+# 
 ```{r}
 library(ggplot2)
 ggplot(pedidos, aes(x = Fecha.Compra) ) +

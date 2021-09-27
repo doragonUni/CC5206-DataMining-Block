@@ -1,56 +1,51 @@
 ---
-title: "Hito1"
-author: "mineria"
-date: "9/16/2021"
-output: html_document
+title: "HITO 1: Análisis clientes Block "
+author: "María Hernández, Sebastián Moreno, Lung Pang, Cristóbal Saldías, Víctor Vidal."
+date: "28 de Septiembre 2021"
+output: 
+  html_document:
+  theme: default
+  toc: yes
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## R Markdown
-## HITO 1: Análisis clientes Block 
-María Hernández, Sebastián Moreno, Lung Pang, Cristóbal Saldías, Víctor Vidal.
-Septiembre 2021
 
 
 
 
 
-1 Introducción
+# 1.Introducción
 
-Blockstore es una cadena de tiendas, ubicada en Chile, enfocada la venta de zapatillas, accesorios y vestuario de las mejores marcas urbanas.
+**Blockstore** es una cadena de tiendas, ubicada en Chile, enfocada la venta de zapatillas, accesorios y vestuario de las mejores marcas urbanas.
 Dada la contingencia mundial de la pandemia y el estallido social del 2019, Block tuvo que adaptarse al canal de ventas online por lo que la necesidad de la aplicación de análisis de datos y en particular de minería de datos va en el contexto cambiante en el ámbito nacional, donde la crisis social, pandemia, mayor dinero circulante y un aumento explosivo en ventas online hacen necesario tener las mejores estrategias diferenciadas para cada cliente,
 
 Es por esto que decidimos estudiar el comportamiento de compra de los clientes a nivel nacional.
 Nos parece interesante estudiar estos datos para generar más ventas enfocando una estrategia de negocios diferenciada para cada grupo de clientes en específico de acuerdo a sus gustos.
 
 
-2 Exploración de Datos
+# 2.Exploración de Datos
 
 ```{r}
 # Asignamos nuestro "working directory" (set w. d.) como el directorio ~/RDATA
 setwd("~/RDATA/")
 ```
-# Cargamos los datos originales 
+**Cargamos los datos originales**
 Sin embargo, estos datos no están limpios debido a que los clientes no ingresaron bien los datos, por lo que se realizó una limpieza de los datos para poder trabajar de mejor manera.
 ```{r}
 pedidos_preeliminar <- read.csv("orders.csv", encoding = "UTF-8")
 pedidos_detalle_preeliminar <-read.csv("order_detail.csv", encoding = "UTF-8")
 ```
 
-# A modo de resumen se deja un head y la cantidad de columnas y filas de cada dataset
+A modo de resumen se deja un head y la cantidad de columnas y filas de cada dataset
 ```{r}
-head(pedidos_preeliminar)
-head(pedidos_detalle_preeliminar)
+head(pedidos_preeliminar, 3)
+head(pedidos_detalle_preeliminar, 3)
 nrow(pedidos_preeliminar)
 ncol(pedidos_preeliminar)
 nrow(pedidos_detalle_preeliminar)
 ncol(pedidos_detalle_preeliminar)
 
 ```
-Para la limpieza se eliminaron filas vacías, datos "dummy" realizados por la empresa, y otros valores incosistentes y repetitivos.
+Para la limpieza se eliminaron filas vacías, datos *dummy* realizados por la empresa, y otros valores incosistentes y repetitivos.
 También se hizo un refactoring de los nombres de las columnas para un mejor entendimiento del dataset.
 ```{r}
 
@@ -61,33 +56,32 @@ pedidos_detalle$count.marca <- as.numeric(ave(pedidos_detalle$Marca, pedidos_det
 
 
 ```
-Dejamos un resumen del data pedidos
+Dejamos un resumen del data pedidos:
 
 ```{r}
-(pedidos)
+head(pedidos, 3)
 nrow(pedidos)
 ncol(pedidos)
 
 ```
-Dejamos un resumen del data pedidos_detalle
+Dejamos un resumen del data pedidos_detalle:
 
 ```{r}
-(pedidos_detalle)
+head(pedidos_detalle, 3)
 nrow(pedidos_detalle)
 ncol(pedidos_detalle)
 ```
 
 
 ```{R}
-
+# Se cambia el formato de la columna Fecha.Compra a Date.
 pedidos$Fecha.Compra <- as.Date(pedidos$Fecha.Compra, format ="%d-%m-%Y")
-(pedidos)
 
-
+# Se cambia el formato de la columna Fecha.Pedido a Date.
+# También se agrega una columna con el año.
 pedidos_detalle$Fecha.Pedido <- as.Date(pedidos_detalle$Fecha.Pedido, format ="%Y-%m-%d")
 pedidos_detalle$anio <- as.numeric(format(pedidos_detalle$Fecha.Pedido,'%Y'))
 
-(pedidos_detalle)
 
 ```
 
@@ -98,15 +92,16 @@ summary(pedidos_detalle)
 
 ```{R}
 library(ggplot2)
+library(dplyr)
 ```
 
 
 
 
 
-##A continuación les dejaremos el estudio de datos sobre nuestro dataset
+# 2.1. Estudio sobre los datos filtrados
 
-#A grandes razgos podemos calcular la cantidad promedio que se gasta una persona en Block
+1. **A grandes razgos podemos calcular la cantidad promedio que se gasta una persona en Block:**
 ```{r}
 nfilas <- nrow(pedidos)
 
@@ -116,7 +111,7 @@ promedio_pedidos <- total_vendido/nfilas
 ```
 
 
-# Vamos a ver primero la cantidad de gente que pide más y menos que el promedio 
+2. **Vamos a ver primero la cantidad de gente que pide más y menos que el promedio:**
 ```{r}
 
 
@@ -135,9 +130,8 @@ nrow(pedidos_RM_menorpromedio)
 
 ```
 
-##El pedido mas caro en block online
-## Podemos ver que en la tabla pedidos_Detalles según el numero de pedido podemos ver el detalle
-## de la compra que realizó la clienta.
+3. **El pedido más caro en Block online**
+Podemos ver que en la tabla pedidos_Detalles según el numero de pedido podemos ver el detalle de la compra que realizó la clienta.
 ```{R}
 
 pedidos[which.max(pedidos$Precio.Pedido),]
@@ -147,7 +141,7 @@ pedido_maximo_detalle <- pedidos_detalle[pedidos_detalle$Numero.Pedido == "#BL44
 sum(pedido_maximo_detalle$Precio.Total.Productos)
 ```
 
-# La cantidad de pedidos divididos por región
+4. **La cantidad de pedidos divididos por región:**
 
 ```{r}
 
@@ -158,7 +152,7 @@ ggplot(pedidos, aes(x = REGION.CON.CODIGO),) +
 ```
 
 
-# Cantidad de pedidos dividos por comuna 
+5. **Cantidad de pedidos dividos por comuna**
 ```{R}
 
 
@@ -166,28 +160,24 @@ freq_comuna <- data.frame(comuna = pedidos$Comuna, count = pedidos$count)
 freq_comuna <-  unique(freq_comuna)
 freq_comuna <- freq_comuna[order(freq_comuna[,"count"], decreasing = TRUE),]
 
-(freq_comuna)
-
 ggplot(freq_comuna[1:30,], aes(x = reorder(comuna , count),
                      y = count)) +
    ggtitle("Las 30 Comunas con mas pedidos del pais") +
   coord_flip() +
   geom_bar(stat = "identity")
 ```
-# Puente alto y Las condes son de las comunas más pobladas de la RM
-# Puente alto es una de las comunas más "zapatilleras" vs "Las condes" que es una comuna
-# que tiende mas a la ropa formal y a continuación veremos la cantidad de pedidos, el promedio de estos y la suma total de dinero de las respectivas comunas
+
+6. Puente alto y Las condes son de las comunas más pobladas de la RM
+Puente alto es una de las comunas más "zapatilleras" vs "Las condes" que es una comuna que tiende más a la ropa formal. A continuación veremos la cantidad de pedidos, el promedio de estos y la suma total de dinero de las respectivas comunas:
 
 ```{r}
 pedidos_comuna_Lascondes <- data.frame(pedidos[pedidos$Comuna == "LAS CONDES", ] )
-(pedidos_comuna_Lascondes)
 nrow(pedidos_comuna_Lascondes)
 mean(pedidos_comuna_Lascondes$Precio.Pedido)
 sum(pedidos_comuna_Lascondes$Precio.Pedido)
 
 
 pedidos_comuna_puentealto <- data.frame(pedidos[pedidos$Comuna == "PUENTE ALTO", ] )
-(pedidos_comuna_puentealto)
 nrow(pedidos_comuna_puentealto)
 mean(pedidos_comuna_puentealto$Precio.Pedido)
 sum(pedidos_comuna_puentealto$Precio.Pedido)
@@ -196,10 +186,9 @@ sum(pedidos_comuna_puentealto$Precio.Pedido)
 ```
 
 
-# Se deja un historial de pedidos desde el inicio del dataset hasta la ultima fecha presente
-# 
+7. **Se deja un historial de pedidos desde el inicio del dataset hasta la ultima fecha presente:**
+
 ```{r}
-library(ggplot2)
 ggplot(pedidos, aes(x = Fecha.Compra) ) +
   geom_bar() +
   scale_x_date(date_breaks = "1 month",
@@ -209,16 +198,13 @@ ggplot(pedidos, aes(x = Fecha.Compra) ) +
        y = "Cantidad de pedidos")
 
 ```
-# Vamos a ver cuanto se ha vendido en block por marca
+
+8. **Vamos a ver cuanto se ha vendido en block por marca**
 ```{r}
 
-
-
 freq_marca <- data.frame(marca = pedidos_detalle$Marca, count = pedidos_detalle$count.marca)
-freq_marca <-  distinct(freq_marca)
+freq_marca <-  unique(freq_marca)
 freq_marca <- freq_marca[order(freq_marca[,"count"], decreasing = TRUE),]
-
-(freq_marca)
 
 ggplot(freq_marca[1:30,], aes(x = reorder(marca , count),
                      y = count)) +
@@ -228,14 +214,11 @@ ggplot(freq_marca[1:30,], aes(x = reorder(marca , count),
 
 ```
 
-# Vamos a ver cuanto se ha vendido en block por marca
+9. **Veremos cuanto se ha vendido en block por marca:**
 ```{r}
-
 
 precio_marca <- data.frame(marca = pedidos_detalle$Marca, precio = pedidos_detalle$Precio.Producto)
 
-
-(precio_marca)
 
 ggplot(pedidos_detalle, aes(x = Marca, y = Precio.Producto)) +
   geom_boxplot()+
@@ -243,8 +226,9 @@ ggplot(pedidos_detalle, aes(x = Marca, y = Precio.Producto)) +
   ggtitle("Precios de la marca")
 
 ```
-# Marca mas vendida por año
+10. **Marca mas vendida por año:**
 
+**(se pega el pc xd)**
 
 ggplot(pedidos_detalle[pedidos_detalle$Marca, ], 
        aes(x=Marca, y=count.marca)) +
@@ -254,17 +238,17 @@ ggplot(pedidos_detalle[pedidos_detalle$Marca, ],
 
 ```{r}
 
-
-
-
   
 ```
 
 
-Preguntas y problemas: Dada la exploración anterior y su motivación original, formular preguntas que se pueden responder mediante la minería de datos y que se puedan vincular a la problemática planteada en la motivación
+# Preguntas y problemas
 
-¿Cómo se relaciona el precio de la compra con el lugar desde donde se pidió?(regiones piden paquetes más caros? )
-¿Qué marcas se compran más según el sector?
-¿Qué productos se compran juntos?
-¿Existe una tendencia en la segunda compra con respecto a la primera?(se compra la misma marca 2 veces?)
-¿Qué producto puede que compre alguien que ya adquirió x producto?  
+Dada la exploración anterior y su motivación original, formular preguntas que se pueden responder mediante la minería de datos y que se puedan vincular a la problemática planteada en la motivación
+
+1. **¿Cómo se relaciona el precio de la compra con el lugar desde donde se pidió? (En las regiones piden paquetes más caros?)**
+
+2. **¿Qué marcas se compran más según el sector?**
+3. **¿Qué productos se compran juntos?**
+4. **¿Existe una tendencia en la segunda compra con respecto a la primera?(se compra la misma marca 2 veces?)**
+5. **¿Qué producto puede que compre alguien que ya adquirió x producto?** 

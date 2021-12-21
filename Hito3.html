@@ -15000,7 +15000,7 @@ Puente alto es una de las comunas más "zapatilleras" vs "Las condes" que es una
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Hito-3">Hito 3<a class="anchor-link" href="#Hito-3">&#182;</a></h1><p>Para este hito se trabajará con la librería <em>pandas</em> en <em>Python</em>, por lo que se debe reimportar las bases de datos y también limpiarlas para reordenar las ideas que serán llevadas a cabo en este <em>Hito 2</em>.</p>
+<h1 id="Hito-3">Hito 3<a class="anchor-link" href="#Hito-3">&#182;</a></h1><p>Para este hito se trabajará con la librería <em>pandas</em> en <em>Python</em>, por lo que se debe reimportar las bases de datos y también limpiarlas para reordenar las ideas que serán llevadas a cabo en este <em>Hito 3</em>.</p>
 <p>Se importan las librerías necesarias para la exploración:</p>
 
 </div>
@@ -15394,47 +15394,6 @@ Promedio Iquique:  49105 Cantidad de pedidos: 1249
 <li><strong>¿Qué tipo de producto puede que compre alguien que ya adquirió x tipo de producto?</strong> </li>
 <li><strong>Comportamiento de clientes con respecto a la cantidad de compras y su monto total.</strong> </li>
 </ol>
-
-</div>
-</div>
-<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Pregunta-1">Pregunta 1<a class="anchor-link" href="#Pregunta-1">&#182;</a></h1><p>Para responder a esta pregunta se realizarán los siguientes pasos:</p>
-<ul>
-<li>Utilizaremos Reglas de Asociación, basándose en el problema de la canasta.</li>
-<li>No se ha visto en clases, por lo que no tenemos definido los pasos a seguir.</li>
-</ul>
-<h1 id="Pregunta-2">Pregunta 2<a class="anchor-link" href="#Pregunta-2">&#182;</a></h1><p>Para responder a esta pregunta se realizarán los siguientes pasos usando clasificación:</p>
-<p>-Primero se filtrará la información de la tabla, se rescatarán las características más relevantes: comuna, mes de compra, marca y total gastado cliente.</p>
-<ul>
-<li><p>Luego se procederá a separar el dataset en 2 conjuntos: Training y testing  para entretar los clasificadores. Le ocultaremos los productos de la 2da compra.Utilizaremos el Decision Tree y el Support Vector Machine.</p>
-</li>
-<li><p>Finalmente una vez entrenado los datos se utilizarán parámetros de accuracy, Recall, precision y f1 para determinar qué tan bueno fue el desempeño del clasificador y ver si pudo efectivamente predecir la pregunta en cuestión.</p>
-</li>
-</ul>
-<h1 id="Pregunta-3">Pregunta 3<a class="anchor-link" href="#Pregunta-3">&#182;</a></h1><ul>
-<li><p>De forma análoga a la pregunta 1 Utilizaremos Reglas de Asociación, basándose en el problema de la canasta.</p>
-</li>
-<li><p>Generar una nueva columna  con el tipo de producto (por ejemplo: polera, zapatillas, jockey, entre otros). Para lograrlo, se extraerá la primera palabra del nombre del producto desde la tabla <em>order_detail</em> (por ejemplo: "Zapatilla Adidas 3Mc Mujer - BURDEO / 7.5" corresponde a una zapatilla).</p>
-</li>
-<li><p>No se ha visto en clases, por lo que no tenemos definido los pasos a seguir.</p>
-</li>
-</ul>
-<h1 id="Problema-4">Problema 4<a class="anchor-link" href="#Problema-4">&#182;</a></h1><p>Para responder a esta pregunta se utilizarán herramientas de clustering y se  seguirán los siguientes pasos:</p>
-<ul>
-<li>Crear una tabla que por cada cliente, tenga su cantidad de pedidos totales hechos en la página y cuanto fue el gasto entre todos esos pedidos.</li>
-</ul>
-<p><em>K-means:</em></p>
-<ul>
-<li>Debemos definir el número de clusters que queremos generar.Esto lo hacemos implementando el método del codo.</li>
-<li>Luego se implementaran K-mean segun la cantidad de clusters predicha anteriormente.</li>
-</ul>
-<p><em>DBSCAN:</em></p>
-<ul>
-<li>Se debe estimar el valor óptimo de <em>eps</em> usando el método de la rodilla (basado en KNN).</li>
-<li>Luego se ejecuta y grafica los clusters usando el método DBSCAN haciendo uso de parámetro <em>eps(y)</em> encontrado previamente.</li>
-</ul>
-<p>Finalmente usaremos el coeficiente de Silhouette para evaluar los clusters.</p>
 
 </div>
 </div>
@@ -16208,6 +16167,25 @@ creating S4 object  ... done [0.01s].
 
 </div>
 
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Al observar las reglas de asociación generadas, se puede observar que las con mayor lift son Vans implica converse
+y converse implica Vans lo cual no es de gran sorpresa si es que se conoce los productos que tiene cada marca, esto ya que
+en general similares en estilo. Dada esta regla, podemos ofrecerles indistintamente a clientes que compran una de estas marcas
+productos de la otra.</p>
+<p>Por otro lado, las 3 ultimas reglas son más interesantes ya que Block y Stance son las únicas marcas en la tienda que 
+venden calcetines. Con este resultado, si es que llegaran nuevas marcas de calcetines a la tienda,
+se podrían generar packs de oferta para incentivar la compra de los nuevos productos apoyándose de Vans y Converse 
+dado que por el estudio de datos se sabe que son marcas muy vendidas en Block.</p>
+<p>En el gráfico de matriz agrupada, el cual hay esferas con grupos de antecedentes como columnas
+y consecuentes como filas, donde el color y el tamaño representan las medidas de interés (lift y support).
+Se nota que la regla con mayor lift es Vans -&gt; Convers y la con mayor support Dvs -&gt; Supra.</p>
+<p>Y en este último gráfico las marcas y las reglas son representados como vértices conectados 
+con aristas dirigidas. Las medidas de interés se representan mediante el color y el tamaño
+de los vértices al igual que en el grafo anterior. Este grafico ayuda con la visualización de las reglas.</p>
+
+</div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
@@ -16988,6 +16966,14 @@ creating S4 object  ... done [0.01s].
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Aquí podemos ver esta tabla ordenada por el atributo lift de mayor a menor, donde la primera fila posee un lift de 143, lo que nos indica que ese conjunto aparece una cantidad de veces superior a lo esperado bajo condiciones de independencia.
+Igual que en el resto de los conjuntos, podemos ver cómo la gente suele comprar zapatillas SUPRA y en su siguiente compra lo hace nuevamente.</p>
+<p>Esto lo podemos utilizar a conveniencia para ofrecer descuentos a la gente que suela comprar zapatillas SUPRA en este mismo producto y así poder utilizar de buena manera los resultados obtenidos de cómo se comportan las personas a lo largo de todas las compras realizadas.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="Pregunta-4">Pregunta 4<a class="anchor-link" href="#Pregunta-4">&#182;</a></h2><h3 id="Comportamiento-de-clientes-con-respecto-a-la-cantidad-de-compras-y-su-monto-total">Comportamiento de clientes con respecto a la cantidad de compras y su monto total<a class="anchor-link" href="#Comportamiento-de-clientes-con-respecto-a-la-cantidad-de-compras-y-su-monto-total">&#182;</a></h3>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
@@ -17568,7 +17554,15 @@ Dataset X DBSCAN 4 	 0.9288472444735113
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>En cuanto a la diferenciación de datos se logró ver que los distintos clusters representaban los distintos tipos de clientes, siendo todos estos diferenciados en su mayoría por la distancia en precio, pues por ejemplo los resultados de K-Means resultaron ser efectivos para diferenciar compradores de grandes listas de items, los cuales en su mayoría resultaron en un gasto mayor al millón de pesos chilenos. Para el algoritmo DBScan, probando distintos valores para eps se logró ver que logró agrupar los clientes más casuales, es decir, de baja cantidad de pedidos y precio regular. Este algoritmo consideró como ruido-outliers a los datos de mayor cantidad de pedidos y mayor dinero invertido, por lo cual este último demostró no ser tan efectivo visualmente en nuestro dataset pese a haber conseguido un puntaje de 1 con el coeficiente de Silhouette, pues el algoritmo determina que hace un buen clustering pero no agarra tantos datos como se desearía.</p>
+<p>Finalmente se puede concluir que, como se esperaba, existen clientes que gastan distintas cantidades de dinero en función de la cantidad de pedidos totales, distribución que se puede analizar muy visualmente para concluir que la dispersión es muy grande, pero de todas formas esta distribución se asemeja a una recta acorde van aumentando los pedidos. Además, se puede inferir que esta variabilidad de la cantidad gastada para cantidades grandes de pedidos tiene que ver con el tipo de cliente que realiza estas compras, ya sea un comprador mayorista o un cliente frecuente. Sería interesante poder analizar este mismo tipo de pregunta en datasets más grandes para poder observar como el rango de esta curva se va expandiendo, y si de verdad se asemejaría esto a una recta o no.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="Conclusiones">Conclusiones<a class="anchor-link" href="#Conclusiones">&#182;</a></h1><p>Una de las principales problemáticas a la hora de generar las canastas, fue que en muchas de estas tenían un solo producto o el mismo producto varias veces, lo cuál no es considerado para la generación de las reglas, dificultando la obtención de resultados y disminuyendo los posibles casos existentes.</p>
+<p>En general, se tuvo que filtrar mucho los datos, ya que habían bastantes incongruencias y columnas que no nos eran de utilidad. Para una próxima vez se podría elegir un dataset más pequeño con datos más específicos de lo que necesitamos para evitar esto.</p>
 
 </div>
 </div>
